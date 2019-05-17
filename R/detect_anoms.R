@@ -66,6 +66,7 @@ detect_anoms <- function(data, k = 0.49, alpha = 0.05, num_obs_per_period = NULL
         R_idx <- as.POSIXlt(data[[1L]][1L:max_outliers], tz = "UTC")
     } else {
         R_idx <- 1L:max_outliers
+        score <- 1L:max_outliers
     }
 
     num_anoms <- 0L
@@ -96,6 +97,7 @@ detect_anoms <- function(data, k = 0.49, alpha = 0.05, num_obs_per_period = NULL
         temp_max_idx <- which(ares == R)[1L]
 
         R_idx[i] <- data[[1L]][temp_max_idx]
+        score[i] <- R
 
         data <- data[-which(data[[1L]] == R_idx[i]), ]
 
@@ -115,9 +117,10 @@ detect_anoms <- function(data, k = 0.49, alpha = 0.05, num_obs_per_period = NULL
     
     if(num_anoms > 0) {
       R_idx <- R_idx[1L:num_anoms]
+      score <- score[1L:num_anoms]
     } else {
       R_idx = NULL
     }
       
-    return(list(anoms = R_idx, stl = data_decomp))
+    return(list(anoms = R_idx, stl = data_decomp, scores=score))
 }
