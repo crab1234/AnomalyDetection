@@ -164,13 +164,15 @@ AnomalyDetectionVec = function(x, max_anoms=0.10, direction='pos',
     
     # store decomposed components in local variable and overwrite s_h_esd_timestamps to contain only the anom timestamps
     data_decomp <- s_h_esd_timestamps$stl
+    scores <- s_h_esd_timestamps$scores
     s_h_esd_timestamps <- s_h_esd_timestamps$anoms
     
     # -- Step 3: Use detected anomaly timestamps to extract the actual anomalies (timestamp and value) from the data
     if(!is.null(s_h_esd_timestamps)){      
       anoms <- subset(all_data[[i]], (all_data[[i]][[1]] %in% s_h_esd_timestamps))
+      anoms$scores <- scores
     } else {
-      anoms <- data.frame(timestamp=numeric(0), count=numeric(0))
+      anoms <- data.frame(timestamp=numeric(0), count=numeric(0),scores=numeric(0))
     }
     
     # Filter the anomalies using one of the thresholding functions if applicable
@@ -278,9 +280,9 @@ AnomalyDetectionVec = function(x, max_anoms=0.10, direction='pos',
   
   # Store expected values if set by user
   if(e_value) {
-    anoms <- data.frame(index=all_anoms[[1]], anoms=all_anoms[[2]], expected_value=subset(seasonal_plus_trend[[2]], seasonal_plus_trend[[1]] %in% all_anoms[[1]]))  
+    anoms <- data.frame(index=all_anoms[[1]], anoms=all_anoms[[2]], expected_value=subset(seasonal_plus_trend[[2]], seasonal_plus_trend[[1]] %in% all_anoms[[1]]),score=all_anoms[[3]])  
   } else {
-    anoms <- data.frame(index=all_anoms[[1]], anoms=all_anoms[[2]])
+    anoms <- data.frame(index=all_anoms[[1]], anoms=all_anoms[[2]],score=all_anoms[[3]])
   }
   
   # Lastly, return anoms and optionally the plot if requested by the user
